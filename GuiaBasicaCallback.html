@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva de Callbacks en JS</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .header {
+            background-color: #fff;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header img {
+            height: 40px; /* Ajusta según necesidad */
+            margin-right: 15px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #004A8D; /* Color institucional SENA */
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        .step {
+            display: none; /* Ocultar todos los pasos por defecto */
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+        .step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .step h2 {
+            color: #007bff;
+            margin-top: 0;
+        }
+        .navigation {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .navigation button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            cursor: pointer;
+            border: none;
+            background-color: #28a745; /* Color verde SENA */
+            color: white;
+            border-radius: 5px;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        .navigation button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .navigation button:hover:not(:disabled) {
+            background-color: #218838;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            white-space: pre-wrap; /* Permite saltos de línea */
+            word-wrap: break-word;
+        }
+        code {
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+        }
+        .exercise {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+        }
+        .exercise input[type="text"],
+        .exercise textarea {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            font-size: 1em;
+        }
+         .exercise textarea {
+             min-height: 80px;
+             resize: vertical;
+         }
+        .exercise button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .exercise button:hover {
+            background-color: #0056b3;
+        }
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .feedback.correct {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .feedback.incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+         .visual-demo {
+             margin: 15px 0;
+             padding: 15px;
+             border: 1px dashed #007bff;
+             border-radius: 5px;
+             background-color: #eef7ff;
+         }
+        .visual-demo h4 {
+            margin-top: 0;
+            color: #0056b3;
+        }
+        .output-box {
+            background-color: #fff;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        .output-box strong {
+            color: #333;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <img src="https://i.postimg.cc/mZzx20gW/Logosimbolo-SENA-PRINCIPAL.png" alt="Logo SENA">
+        <h1>Centro de Servicios y Gestión Empresarial</h1>
+    </div>
+
+    <div class="container">
+
+        <div id="step-1" class="step">
+            <h2>Paso 1: ¿Qué es una Callback?</h2>
+            <p>En JavaScript, una función callback es simplemente una función que se pasa como argumento a otra función, con la intención de que sea "llamada de vuelta" (ejecutada) en un momento posterior.</p>
+            <p>Imagina que pides comida a domicilio. Le das tu pedido a la persona que toma la orden (la función principal). Le das también tu número de teléfono (la función callback) para que te llamen cuando la comida esté lista para ser entregada. La persona de la orden no cocina, solo pasa el pedido. El cocinero prepara la comida y, una vez lista, le avisa a alguien para que use el número (la callback) para contactarte.</p>
+            <p>El concepto clave es que la función callback no se ejecuta inmediatamente, sino que se espera a que la función principal termine una tarea o alcance un cierto estado para ser invocada.</p>
+        </div>
+
+        <div id="step-2" class="step">
+            <h2>Paso 2: ¿Por qué usar Callbacks?</h2>
+            <p>Las callbacks son fundamentales en JavaScript, especialmente para manejar operaciones asíncronas (cosas que no ocurren instantáneamente, como leer un archivo, hacer una petición a un servidor o esperar la acción del usuario).</p>
+            <ul>
+                <li>**Flexibilidad:** Permiten que una función genérica realice diferentes acciones dependiendo de la función específica que se le pase como callback.</li>
+                <li>**Manejo de Asincronía:** Son el patrón básico para ejecutar código *después* de que una operación asíncrona haya completado (¡lo veremos en un paso posterior!).</li>
+                <li>**Eventos:** Son la base de los manejadores de eventos (ej. clic de un botón, carga de una página).</li>
+                <li>**Métodos de Array:** Métodos como <code>map</code>, <code>filter</code>, <code>forEach</code> usan callbacks para definir la operación a realizar sobre cada elemento.</li>
+            </ul>
+            <p>En resumen, te ayudan a controlar el *cuando* se ejecuta cierto código.</p>
+        </div>
+
+        <div id="step-3" class="step">
+            <h2>Paso 3: Sintaxis Básica</h2>
+            <p>Pasar una función como argumento es muy sencillo. Defines tu función callback y la incluyes en la llamada de otra función, sin los paréntesis <code>()</code> si quieres pasar la función *en sí* y no el resultado de ejecutarla.</p>
+
+            <div class="visual-demo">
+                <h4>Demostración Visual: Pasando una Función</h4>
+                <p>Aquí, <code>saludar</code> es la función callback:</p>
+                <pre><code class="language-javascript">
+// Nuestra función callback
+function saludar(nombre) {
+  console.log("¡Hola, " + nombre + "!");
+}
+
+// Una función que acepta una callback
+function ejecutarConNombre(nombre, unaFuncionCallback) {
+  console.log("Preparando para saludar...");
+  // Aquí llamamos a la función callback que nos pasaron
+  unaFuncionCallback(nombre);
+  console.log("Saludo completado.");
+}
+
+// Llamamos a ejecutarConNombre, pasando 'saludar' como argumento
+ejecutarConNombre("Aprendiz", saludar);
+                </code></pre>
+                 <p><strong>Salida esperada en la consola:</strong></p>
+                 <div class="output-box">
+                     Preparando para saludar...<br>
+                     ¡Hola, Aprendiz!<br>
+                     Saludo completado.
+                 </div>
+            </div>
+            <p>Como puedes ver, <code>saludar</code> se pasó sin <code>()</code> a <code>ejecutarConNombre</code>, y esta última la ejecutó internamente cuando quiso (en este caso, inmediatamente).</p>
+        </div>
+
+         <div id="step-4" class="step">
+            <h2>Paso 4: Callbacks Síncronas</h2>
+            <p>Las callbacks síncronas son las que se ejecutan *inmediatamente* dentro de la función que las recibe, antes de que esa función termine su propia ejecución.</p>
+            <p>El ejemplo anterior (`ejecutarConNombre`) es una callback síncrona. La función `saludar` se ejecuta justo después del primer `console.log` y antes del segundo `console.log` dentro de `ejecutarConNombre`.</p>
+
+            <div class="visual-demo">
+                 <h4>Demostración Visual: Otro Ejemplo Síncrono</h4>
+                 <pre><code class="language-javascript">
+function aplicarOperacion(num, operacion) {
+  console.log("Aplicando operación a:", num);
+  let resultado = operacion(num); // Ejecuta la callback inmediatamente
+  console.log("Resultado:", resultado);
+  return resultado;
+}
+
+function duplicar(x) {
+  return x * 2;
+}
+
+function sumarDiez(x) {
+  return x + 10;
+}
+
+// Usamos duplicar como callback
+aplicarOperacion(5, duplicar);
+
+// Usamos sumarDiez como callback
+aplicarOperacion(10, sumarDiez);
+                 </code></pre>
+                 <p><strong>Salida esperada en la consola:</strong></p>
+                 <div class="output-box">
+                     Aplicando operación a: 5<br>
+                     Resultado: 10<br>
+                     Aplicando operación a: 10<br>
+                     Resultado: 20
+                 </div>
+            </div>
+             <p>Aquí, `aplicarOperacion` es genérica. Lo que hace *realmente* con el número (`num`) lo define la función `operacion` que se le pasa. Ambas callbacks (`duplicar` y `sumarDiez`) se ejecutan sincrónicamente.</p>
+        </div>
+
+        <div id="step-5" class="step exercise">
+            <h2>Paso 5: Ejercicio 1 - Identifica la Callback</h2>
+            <p>Observa el siguiente fragmento de código:</p>
+            <pre><code class="language-javascript">
+function procesarDatos(lista, funcionTransformadora) {
+  let nuevaLista = [];
+  for (let i = 0; i &lt; lista.length; i++) {
+    nuevaLista.push(funcionTransformadora(lista[i]));
+  }
+  return nuevaLista;
+}
+
+function convertirAMayusculas(texto) {
+  return texto.toUpperCase();
+}
+
+let frutas = ["manzana", "banana", "cereza"];
+let frutasMayusculas = procesarDatos(frutas, convertirAMayusculas);
+            </code></pre>
+            <p>En la línea donde se llama a <code>procesarDatos</code> (<code>procesarDatos(frutas, convertirAMayusculas);</code>), ¿cuál es la función que se está pasando como callback?</p>
+
+            <div class="exercise">
+                <label for="ej1-answer">Escribe el nombre de la función callback:</label><br>
+                <input type="text" id="ej1-answer">
+                <button onclick="checkExercise(1)">Comprobar</button>
+                <div id="ej1-feedback" class="feedback"></div>
+            </div>
+        </div>
+
+        <div id="step-6" class="step exercise">
+            <h2>Paso 6: Ejercicio 2 - Aplicando una Callback Síncrona</h2>
+            <p>Tenemos una función llamada <code>ejecutarOperacion</code> que toma un número y una función callback. La función callback recibe el número y debe devolver el resultado de alguna operación.</p>
+             <pre><code class="language-javascript">
+function ejecutarOperacion(valor, callback) {
+  console.log("Valor inicial:", valor);
+  let resultado = callback(valor);
+  console.log("Resultado de la operación:", resultado);
+}
+
+// Tu tarea es llamar a ejecutarOperacion
+// y pasarle una función callback anónima
+// que multiplique el valor por 3.
+            </code></pre>
+            <p>Si llamas a <code>ejecutarOperacion</code> con el valor <code>7</code> y una función callback que multiplique por 3, ¿qué valor se mostrará en la consola como "Resultado de la operación:"?</p>
+             <p><em>Pista: La callback recibe el valor inicial y debes devolver el valor multiplicado.</em></p>
+
+            <div class="exercise">
+                <label for="ej2-answer">Escribe el número que se mostrará como resultado:</label><br>
+                <input type="text" id="ej2-answer">
+                <button onclick="checkExercise(2)">Comprobar</button>
+                <div id="ej2-feedback" class="feedback"></div>
+            </div>
+        </div>
+
+         <div id="step-7" class="step">
+            <h2>Paso 7: Callbacks Asíncronas (Introducción)</h2>
+            <p>Las callbacks asíncronas son las que se ejecutan *después* de que la función principal ha terminado o ha continuado su ejecución. Esto es crucial para no "bloquear" el programa mientras espera algo lento (como una descarga o una espera).</p>
+            <p>El ejemplo clásico en JavaScript es <code>setTimeout</code>.</p>
+
+            <div class="visual-demo">
+                 <h4>Demostración Visual: setTimeout</h4>
+                 <pre><code class="language-javascript">
+console.log("Paso 1: Inicio");
+
+setTimeout(function() {
+  // Esta es la función callback
+  // Se ejecutará DESPUÉS de que pase el tiempo especificado
+  console.log("Paso 3: Esto aparece después del tiempo");
+}, 2000); // Espera 2000 milisegundos (2 segundos)
+
+console.log("Paso 2: Este mensaje no espera");
+                 </code></pre>
+                 <p><strong>Salida esperada en la consola (orden):</strong></p>
+                 <div class="output-box">
+                     Paso 1: Inicio<br>
+                     Paso 2: Este mensaje no espera<br>
+                     <em>(Espera 2 segundos)</em><br>
+                     Paso 3: Esto aparece después del tiempo
+                 </div>
+            </div>
+            <p>Observa que "Paso 2" aparece antes que "Paso 3", aunque "Paso 3" está definido primero en el código. Esto sucede porque <code>setTimeout</code> programa la ejecución de la callback para *más tarde* y permite que el resto del código (el segundo <code>console.log</code>) se ejecute inmediatamente.</p>
+            <p>Entender esto es clave para trabajar con muchas APIs de JavaScript (eventos, peticiones HTTP, etc.) que son asíncronas y se basan en callbacks.</p>
+        </div>
+
+        <div id="step-8" class="step exercise">
+             <h2>Paso 8: Ejercicio 3 - Orden de Ejecución Asíncrona</h2>
+             <p>Considera el siguiente código con <code>setTimeout</code>:</p>
+             <pre><code class="language-javascript">
+console.log("A");
+
+setTimeout(function() {
+  console.log("B");
+}, 1000); // 1 segundo de espera
+
+setTimeout(function() {
+  console.log("C");
+}, 0); // 0 milisegundos de espera (se ejecuta tan pronto como sea posible después del código síncrono)
+
+console.log("D");
+             </code></pre>
+             <p>¿En qué orden exacto aparecerán las letras A, B, C y D en la consola? (Separa las letras con comas, por ejemplo: A, C, B, D)</p>
+
+             <div class="exercise">
+                 <label for="ej3-answer">Escribe el orden de las letras (ej: A, B, C, D):</label><br>
+                 <input type="text" id="ej3-answer">
+                 <button onclick="checkExercise(3)">Comprobar</button>
+                 <div id="ej3-feedback" class="feedback"></div>
+             </div>
+        </div>
+
+
+        <div id="step-9" class="step">
+            <h2>Paso 9: Usos Comunes de Callbacks</h2>
+            <p>Hemos visto ejemplos sencillos, pero las callbacks aparecen constantemente en JavaScript real:</p>
+            <ul>
+                <li>**Manejadores de Eventos:** Cuando añades un "listener" a un elemento (ej. <code>elemento.addEventListener('click', funcionCallback)</code>), la función callback se ejecuta cuando ocurre el evento.</li>
+                <li>**Métodos de Array:** <code>.forEach()</code>, <code>.map()</code>, <code>.filter()</code>, <code>.reduce()</code>, <code>.sort()</code>, etc., todos toman una función callback que se aplica a los elementos del array.</li>
+                <li>**Peticiones HTTP (Fetch, XMLHttpRequest):** Se usan callbacks (o Promesas, que a menudo usan callbacks internamente) para manejar la respuesta cuando llega.</li>
+                <li>**Lectura de Archivos:** En entornos como Node.js, leer archivos suele ser asíncrono y usa callbacks.</li>
+            </ul>
+            <p>Dominar el concepto de callback es esencial para trabajar con código JavaScript moderno.</p>
+        </div>
+
+        <div id="step-10" class="step">
+            <h2>Paso 10: Conclusión</h2>
+            <p>¡Felicidades! Has completado esta guía básica sobre callbacks en JavaScript.</p>
+            <ul>
+                <li>Aprendiste que una callback es una función que se pasa como argumento a otra función.</li>
+                <li>Comprendiste por qué son importantes, especialmente para el manejo de asincronía.</li>
+                <li>Viste la sintaxis básica para pasar y ejecutar callbacks.</li>
+                <li>Exploraste ejemplos de callbacks síncronas y asíncronas (con <code>setTimeout</code>).</li>
+                <li>Aplicaste los conceptos en ejercicios prácticos.</li>
+            </ul>
+            <p>Este es solo el comienzo. A medida que explores más JavaScript, reconocerás el patrón de callbacks en muchos lugares. Conceptos más avanzados como las Promesas y <code>async/await</code> se construyen sobre la base de manejar operaciones asíncronas, a menudo utilizando callbacks internamente.</p>
+            <p>¡Sigue practicando y explorando!</p>
+        </div>
+
+
+        <div class="navigation">
+            <button id="prevBtn" disabled>Anterior</button>
+            <button id="nextBtn">Siguiente</button>
+        </div>
+
+    </div>
+
+    <script>
+        const steps = document.querySelectorAll('.step');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        let currentStepIndex = 0;
+
+        function showStep(index) {
+            steps.forEach((step, i) => {
+                step.style.display = i === index ? 'block' : 'none';
+            });
+            currentStepIndex = index;
+            updateNavigationButtons();
+        }
+
+        function updateNavigationButtons() {
+            prevBtn.disabled = currentStepIndex === 0;
+            nextBtn.disabled = currentStepIndex === steps.length - 1;
+        }
+
+        function nextStep() {
+            if (currentStepIndex < steps.length - 1) {
+                showStep(currentStepIndex + 1);
+            }
+        }
+
+        function prevStep() {
+            if (currentStepIndex > 0) {
+                showStep(currentStepIndex - 1);
+            }
+        }
+
+        // Attach event listeners
+        prevBtn.addEventListener('click', prevStep);
+        nextBtn.addEventListener('click', nextStep);
+
+        // Initialize the guide
+        showStep(currentStepIndex);
+
+
+        // --- Exercise Logic ---
+
+        function checkExercise(exerciseNumber) {
+            let inputId, feedbackId, correctAnswer, feedbackElement;
+
+            switch (exerciseNumber) {
+                case 1:
+                    inputId = 'ej1-answer';
+                    feedbackId = 'ej1-feedback';
+                    correctAnswer = 'convertirAMayusculas';
+                    break;
+                case 2:
+                    inputId = 'ej2-answer';
+                    feedbackId = 'ej2-feedback';
+                    // Expected output is 7 * 3 = 21
+                    correctAnswer = '21';
+                    break;
+                 case 3:
+                    inputId = 'ej3-answer';
+                    feedbackId = 'ej3-feedback';
+                    // Expected order: A, D, C, B (setTimeout 0 runs after sync code, setTimeout 1000 runs later)
+                    correctAnswer = 'A, D, C, B'; // Accept variations? Let's keep it strict for simplicity.
+                    break;
+                default:
+                    console.error("Unknown exercise number:", exerciseNumber);
+                    return;
+            }
+
+            const userAnswer = document.getElementById(inputId).value.trim();
+            feedbackElement = document.getElementById(feedbackId);
+
+            // Basic comparison, case-insensitive and ignoring extra spaces for some answers
+            let isCorrect = false;
+            if (exerciseNumber === 1) {
+                 isCorrect = userAnswer.toLowerCase() === correctAnswer.toLowerCase();
+            } else if (exerciseNumber === 2) {
+                 isCorrect = userAnswer === correctAnswer; // Strict number string match
+            } else if (exerciseNumber === 3) {
+                 // Normalize input for comparison (remove spaces, make uppercase, split by comma)
+                 const normalizedUserAnswer = userAnswer.toUpperCase().replace(/\s/g, '').split(',').join(', ');
+                 const normalizedCorrectAnswer = correctAnswer.toUpperCase().replace(/\s/g, '').split(',').join(', ');
+                 isCorrect = normalizedUserAnswer === normalizedCorrectAnswer;
+                 if (!isCorrect) {
+                     // Also allow just the letters without commas/spaces in exact order
+                     const rawUserAnswer = userAnswer.toUpperCase().replace(/[^A-Z]/g, '');
+                     const rawCorrectAnswer = correctAnswer.toUpperCase().replace(/[^A-Z]/g, '');
+                      if (rawUserAnswer === rawCorrectAnswer) {
+                         isCorrect = true;
+                     }
+                 }
+            }
+
+
+            if (isCorrect) {
+                feedbackElement.textContent = "¡Correcto!";
+                feedbackElement.className = 'feedback correct';
+            } else {
+                feedbackElement.textContent = "Incorrecto. Intenta de nuevo.";
+                feedbackElement.className = 'feedback incorrect';
+            }
+        }
+
+        // Make checkExercise globally available for onclick attributes
+        window.checkExercise = checkExercise;
+
+    </script>
+
+</body>
+</html>
