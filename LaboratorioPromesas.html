@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratorio de Promesas en JavaScript</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #fff;
+            padding: 10px 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: flex-start; /* Align items to the start */
+        }
+        header img {
+            height: 50px; /* Adjust height as needed */
+            margin-right: 20px; /* Space between logo and text */
+        }
+        header span {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #003366; /* SENA blue color */
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1, h2, h3 {
+            color: #003366;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            margin-top: 20px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #ccc;
+        }
+        .section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .simulation {
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+            background-color: #e9e9e9;
+            margin-top: 15px;
+        }
+        .simulation-state {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            min-height: 50px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .exercise {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .exercise-code {
+            width: calc(100% - 20px);
+            height: 120px;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            font-family: monospace;
+            font-size: 0.9em;
+            resize: vertical;
+        }
+        .exercise-actions {
+            margin-top: 10px;
+            text-align: right;
+        }
+        .run-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+        .run-button:hover {
+            background-color: #0056b3;
+        }
+        .exercise-feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #fff;
+            min-height: 30px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.9em;
+        }
+        .feedback-success {
+            border-color: #28a745;
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .feedback-error {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        code {
+            font-family: monospace;
+            background-color: #f0f0f0;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        pre code {
+             background-color: transparent;
+             padding: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="https://i.postimg.cc/mZzx20gW/Logosimbolo-SENA-PRINCIPAL.png" alt="Logo SENA">
+        <span>Centro de Servicios y Gestión Empresarial</span>
+    </header>
+
+    <div class="container">
+        <h1>Laboratorio de Promesas en JavaScript</h1>
+
+        <div class="section">
+            <h2>1. Teoría: ¿Qué son las Promesas?</h2>
+            <p>Una Promesa (<code>Promise</code>) en JavaScript es un objeto que representa la eventual finalización (o falla) de una operación asíncrona y su valor resultante.</p>
+            <p>Sirven como un sustituto para los callbacks anidados (conocido como "callback hell"), haciendo que el código asíncrono sea más legible y fácil de manejar.</p>
+
+            <h3>Estados de una Promesa</h3>
+            <ul>
+                <li><code>pending</code>: Estado inicial, la operación no se ha completado aún.</li>
+                <li><code>fulfilled</code> (Resuelta): La operación se completó con éxito.</li>
+                <li><code>rejected</code> (Rechazada): La operación falló.</li>
+            </ul>
+            <p>Una promesa <code>pending</code> puede pasar a <code>fulfilled</code> o <code>rejected</code>, pero no puede pasar de <code>fulfilled</code> a <code>rejected</code> o viceversa. Una vez que cambia de <code>pending</code>, se considera <code>settled</code> (resuelta o rechazada) y su estado es inmutable.</p>
+
+            <h3>Sintaxis Básica</h3>
+            <p>Crear una promesa:</p>
+            <pre><code>
+const miPromesa = new Promise((resolve, reject) => {
+  // Realizar una operación asíncrona aquí
+  const exito = true; // Simula el resultado de la operación
+
+  if (exito) {
+    resolve('¡Operación exitosa!'); // Llama a resolve si tiene éxito
+  } else {
+    reject('Ocurrió un error.'); // Llama a reject si falla
+  }
+});
+            </code></pre>
+            <p>Manejar el resultado:</p>
+            <pre><code>
+miPromesa
+  .then(resultado => {
+    // Se ejecuta si la promesa se resuelve (fulfilled)
+    console.log('Éxito:', resultado);
+  })
+  .catch(error => {
+    // Se ejecuta si la promesa se rechaza (rejected)
+    console.error('Error:', error);
+  })
+  .finally(() => {
+    // Se ejecuta siempre, sin importar si se resolvió o rechazó
+    console.log('La promesa ha terminado.');
+  });
+            </code></pre>
+        </div>
+
+        <div class="section">
+            <h2>2. Simulación Interactiva de Promesas</h2>
+            <p>Haz click en el botón para simular una operación asíncrona que puede resolverse o rechazarse aleatoriamente después de un breve retraso.</p>
+
+            <div class="simulation">
+                <button id="simulate-promise-btn">Iniciar Simulación</button>
+                <div class="simulation-state" id="simulation-output">Esperando para iniciar...</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>3. Ejercicios Prácticos (Nivel Básico)</h2>
+            <p>Escribe código JavaScript en el área de texto para crear y manejar promesas según la descripción de cada ejercicio. Haz click en "Ejecutar" para ver el resultado.</p>
+
+            <div id="exercises-container">
+                <!-- Exercises will be loaded here by JavaScript -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Simulación Interactiva ---
+            const simulateBtn = document.getElementById('simulate-promise-btn');
+            const simulationOutput = document.getElementById('simulation-output');
+
+            simulateBtn.addEventListener('click', () => {
+                simulationOutput.textContent = 'Estado: pending...';
+                simulationOutput.className = 'simulation-state'; // Reset class
+
+                const randomDelay = Math.random() * 2000 + 500; // Delay between 0.5 and 2.5 seconds
+                const shouldSucceed = Math.random() > 0.5; // 50% chance of success
+
+                const simulationPromise = new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        if (shouldSucceed) {
+                            resolve(`Éxito: Operación completada después de ${randomDelay.toFixed(0)}ms.`);
+                        } else {
+                            reject(`Error: Operación fallida después de ${randomDelay.toFixed(0)}ms.`);
+                        }
+                    }, randomDelay);
+                });
+
+                simulationPromise
+                    .then(result => {
+                        simulationOutput.textContent = `Estado: fulfilled\nValor: ${result}`;
+                         simulationOutput.className = 'simulation-state feedback-success';
+                    })
+                    .catch(error => {
+                        simulationOutput.textContent = `Estado: rejected\nRazón: ${error}`;
+                        simulationOutput.className = 'simulation-state feedback-error';
+                    })
+                     .finally(() => {
+                         // Optional: Add a finally state update if needed, but then/catch handle the final state
+                         // simulationOutput.textContent += '\n(Finalmente se completó)';
+                     });
+            });
+
+
+            // --- Ejercicios Prácticos ---
+            const exercisesContainer = document.getElementById('exercises-container');
+
+            const exercises = [
+                {
+                    id: 1,
+                    description: 'Crea una promesa que se resuelva (resolve) inmediatamente con el mensaje "¡Ejercicio 1 Resuelto!".',
+                    starterCode: 'new Promise((resolve, reject) => {\n  // Tu código aquí\n});',
+                    validate: async (userPromise) => {
+                        try {
+                            const result = await userPromise;
+                            if (result === '¡Ejercicio 1 Resuelto!') {
+                                return { success: true, message: `Promesa Resuelta:\n${result}` };
+                            } else {
+                                return { success: false, message: `Promesa Resuelta con valor inesperado:\n${result}\nSe esperaba "¡Ejercicio 1 Resuelto!".` };
+                            }
+                        } catch (error) {
+                             return { success: false, message: `Promesa Rechazada (se esperaba Resuelta):\n${error}` };
+                        }
+                    }
+                },
+                 {
+                    id: 2,
+                    description: 'Crea una promesa que se rechace (reject) inmediatamente con el mensaje "¡Ejercicio 2 Rechazado!".',
+                    starterCode: 'new Promise((resolve, reject) => {\n  // Tu código aquí\n});',
+                    validate: async (userPromise) => {
+                        try {
+                            const result = await userPromise;
+                             return { success: false, message: `Promesa Resuelta (se esperaba Rechazada):\n${result}` };
+                        } catch (error) {
+                            if (error === '¡Ejercicio 2 Rechazado!') {
+                                return { success: true, message: `Promesa Rechazada:\n${error}` };
+                            } else {
+                                return { success: false, message: `Promesa Rechazada con razón inesperada:\n${error}\nSe esperaba "¡Ejercicio 2 Rechazado!".` };
+                            }
+                        }
+                    }
+                },
+                 {
+                    id: 3,
+                    description: 'Crea una promesa que se resuelva después de 500ms con el mensaje "Resuelta con Retraso". Utiliza <code>setTimeout</code>.',
+                    starterCode: 'new Promise((resolve, reject) => {\n  // Tu código aquí (usa setTimeout)\n});',
+                    validate: async (userPromise) => {
+                         const startTime = Date.now();
+                        try {
+                            const result = await userPromise;
+                             const endTime = Date.now();
+                             const duration = endTime - startTime;
+                            if (result === 'Resuelta con Retraso' && duration >= 450) { // Allow a small margin
+                                return { success: true, message: `Promesa Resuelta Correctamente:\n${result}\nDemoró ~${duration}ms.` };
+                            } else {
+                                return { success: false, message: `Promesa Resuelta, pero valor o retraso incorrecto:\nValor: ${result}\nDemoró ~${duration}ms.\nSe esperaba "Resuelta con Retraso" y al menos 500ms.` };
+                            }
+                        } catch (error) {
+                             return { success: false, message: `Promesa Rechazada (se esperaba Resuelta con retraso):\n${error}` };
+                        }
+                    }
+                }
+                // Add more exercises here...
+            ];
+
+            function renderExercises() {
+                exercisesContainer.innerHTML = exercises.map(exercise => `
+                    <div class="exercise" data-id="${exercise.id}">
+                        <h3>Ejercicio ${exercise.id}</h3>
+                        <p>${exercise.description}</p>
+                        <textarea class="exercise-code" id="code-${exercise.id}">${exercise.starterCode}</textarea>
+                        <div class="exercise-actions">
+                            <button class="run-button" data-id="${exercise.id}">Ejecutar</button>
+                        </div>
+                        <div class="exercise-feedback" id="feedback-${exercise.id}">Esperando ejecución...</div>
+                    </div>
+                `).join('');
+
+                // Add event listeners after rendering
+                document.querySelectorAll('.run-button').forEach(button => {
+                    button.addEventListener('click', handleRunCode);
+                });
+            }
+
+            async function handleRunCode(event) {
+                const exerciseId = parseInt(event.target.dataset.id, 10);
+                const codeTextArea = document.getElementById(`code-${exerciseId}`);
+                const feedbackDiv = document.getElementById(`feedback-${exerciseId}`);
+                const userCode = codeTextArea.value;
+                const exercise = exercises.find(ex => ex.id === exerciseId);
+
+                feedbackDiv.textContent = 'Ejecutando...';
+                feedbackDiv.className = 'exercise-feedback'; // Reset class
+
+                if (!exercise || !exercise.validate) {
+                     feedbackDiv.textContent = 'Error: Configuración de ejercicio inválida.';
+                     feedbackDiv.className = 'exercise-feedback feedback-error';
+                     return;
+                }
+
+                try {
+                    // Use an async IIFE to safely evaluate user code expecting a Promise
+                    const promiseEvaluation = await (async () => {
+                         // Simple evaluation within an IIFE.
+                         // THIS IS BASIC. In a real environment, use a sandboxed iframe or worker.
+                         // Eval is dangerous with untrusted code. For a simple teaching lab, it's *used* cautiously.
+                         // We expect the user code to return a Promise instance.
+                         try {
+                             const result = eval(`(${userCode})`); // Eval wrapped in parens to treat as expression
+                             if (result instanceof Promise) {
+                                 return result; // Return the promise
+                             } else {
+                                  throw new Error('El código debe retornar una instancia de Promise.');
+                             }
+                         } catch (evalError) {
+                             // Catch syntax errors or errors during initial promise creation
+                             throw new Error(`Error de ejecución:\n${evalError.message}`);
+                         }
+                    })();
+
+                    // Validate the promise returned by the user's code
+                    const validationResult = await exercise.validate(promiseEvaluation);
+
+                    feedbackDiv.textContent = validationResult.message;
+                    feedbackDiv.className = `exercise-feedback ${validationResult.success ? 'feedback-success' : 'feedback-error'}`;
+
+                } catch (error) {
+                     // Catch errors from eval or initial validation step
+                     feedbackDiv.textContent = `Error inesperado durante la ejecución:\n${error.message}`;
+                     feedbackDiv.className = 'exercise-feedback feedback-error';
+                }
+            }
+
+            // Initial render of exercises
+            renderExercises();
+
+        });
+    </script>
+
+</body>
+</html>

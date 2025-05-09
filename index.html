@@ -161,6 +161,10 @@
     <div class="header">
         <img src="https://i.postimg.cc/mZzx20gW/Logosimbolo-SENA-PRINCIPAL.png" alt="Logo SENA">
         <h1>Centro de Servicios y Gestión Empresarial</h1>
+     <button id="guide2Btn" style="margin-left: auto; padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Desestructuracion</button>
+     <button id="guide3Btn" style="margin-left: auto; padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Promesas</button>
+     <button id="guide4Btn" style="margin-left: auto; padding: 10px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Laboratorio Promesas</button>
+
     </div>
 
     <div class="container">
@@ -399,6 +403,7 @@ console.log("D");
         <div class="navigation">
             <button id="prevBtn" disabled>Anterior</button>
             <button id="nextBtn">Siguiente</button>
+            
         </div>
 
     </div>
@@ -508,6 +513,27 @@ console.log("D");
         window.checkExercise = checkExercise;
 
     </script>
+    <script>
+    // Lógica para redirigir a otra vista
+    const guide2Btn = document.getElementById('guide2Btn');
+    guide2Btn.addEventListener('click', () => {
+        window.location.href = 'desestructuracion.html'; // Cambia 'ruta_a_guia_2.html' por la URL o ruta de tu vista
+    });
+</script>
+  <script>
+    // Lógica para redirigir a otra vista
+    const guide3Btn = document.getElementById('guide3Btn');
+    guide3Btn.addEventListener('click', () => {
+        window.location.href = 'promesas.html'; // Cambia 'ruta_a_guia_2.html' por la URL o ruta de tu vista
+    });
+</script>
+  <script>
+    // Lógica para redirigir a otra vista
+    const guide4Btn = document.getElementById('guide4Btn');
+    guide4Btn.addEventListener('click', () => {
+        window.location.href = 'LaboratorioPromesas.html'; // Cambia 'ruta_a_guia_2.html' por la URL o ruta de tu vista
+    });
+</script>
 
 </body>
 </html>

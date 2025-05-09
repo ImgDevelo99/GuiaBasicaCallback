@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Desestructuración en JavaScript</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding-top: 60px; /* Adjust for fixed header */
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: #ffffff; /* White background for header */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            box-sizing: border-box;
+            z-index: 1000; /* Ensure header is on top */
+        }
+
+        header img {
+            height: 40px; /* Adjust height as needed */
+            margin-right: 15px;
+        }
+
+        header span {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #333; /* Dark color for text */
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1, h2, h3 {
+            color: #007bff; /* Primary blue color */
+        }
+
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+        }
+
+        pre {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+        }
+
+        .navigation {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .exercise-area {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px dashed #007bff;
+            border-radius: 5px;
+            background-color: #e9f5ff; /* Light blue background */
+        }
+
+        .exercise-area textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            box-sizing: border-box; /* Include padding and border in element's total width and height */
+        }
+
+        .feedback {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .feedback.success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .feedback.fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .visual-hint {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #fff3cd; /* Light yellow */
+            border: 1px solid #ffc107;
+            border-radius: 4px;
+            color: #856404;
+            font-weight: bold;
+            white-space: pre-wrap; /* Preserve whitespace for ASCII art */
+            font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="https://i.postimg.cc/mZzx20gW/Logosimbolo-SENA-PRINCIPAL.png" alt="Logo SENA">
+        <span>Centro de Servicios y Gestión Empresarial</span>
+    </header>
+
+    <div class="container">
+        <div id="content">
+            <!-- Content will be loaded here by JavaScript -->
+        </div>
+
+        <div class="exercise-area" id="exerciseArea" style="display: none;">
+            <h4>Tu Código:</h4>
+            <p id="exerciseInstructions"></p>
+            <pre><code id="exerciseSetupCode"></code></pre>
+            <textarea id="userCodeInput"></textarea>
+            <button id="checkExerciseButton">Verificar</button>
+            <div id="feedback" class="feedback" style="display: none;"></div>
+        </div>
+
+        <div class="navigation">
+            <button id="prevBtn" disabled>Anterior</button>
+            <button id="nextBtn">Siguiente</button>
+        </div>
+    </div>
+
+    <script>
+        const contentDiv = document.getElementById('content');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const exerciseArea = document.getElementById('exerciseArea');
+        const exerciseInstructions = document.getElementById('exerciseInstructions');
+        const exerciseSetupCode = document.getElementById('exerciseSetupCode');
+        const userCodeInput = document.getElementById('userCodeInput');
+        const checkExerciseButton = document.getElementById('checkExerciseButton');
+        const feedbackDiv = document.getElementById('feedback');
+
+        let currentStepIndex = 0;
+
+        const steps = [
+            {
+                title: "Introducción a la Desestructuración",
+                type: "theory",
+                content: `
+                    <p>¡Bienvenido a la guía interactiva sobre la desestructuración en JavaScript!</p>
+                    <p>La desestructuración es una característica poderosa introducida en ES6 (ECMAScript 2015) que permite extraer valores de arrays u objetos y asignarlos a variables de una manera más concisa y legible.</p>
+                    <p>Imagina que tienes un objeto con muchos datos o un array largo, y solo necesitas usar unos pocos valores específicos. Tradicionalmente, tendrías que acceder a ellos uno por uno usando la notación de punto (<code>objeto.propiedad</code>) o corchetes (<code>array[indice]</code>). La desestructuración simplifica este proceso.</p>
+                    <p>Veremos cómo funciona tanto para arrays como para objetos, y cómo aplicar conceptos básicos como valores por defecto y el operador rest.</p>
+                `
+            },
+            {
+                title: "Desestructuración de Arrays: Básico",
+                type: "theory",
+                content: `
+                    <h2>Desestructuración de Arrays</h2>
+                    <p>La desestructuración de arrays te permite desempaquetar valores de arrays en variables separadas.</p>
+                    <p>La sintaxis utiliza corchetes <code>[]</code> en el lado izquierdo de la asignación, similar a cómo defines un array literal.</p>
+                    <h3>Ejemplo Básico:</h3>
+                    <pre><code class="language-javascript">
+// Array original
+const colores = ['rojo', 'verde', 'azul'];
+
+// Desestructuración
+const [primerColor, segundoColor, tercerColor] = colores;
+
+console.log(primerColor);  // Salida: 'rojo'
+console.log(segundoColor); // Salida: 'verde'
+console.log(tercerColor);  // Salida: 'azul'
+                    </code></pre>
+                    <p>Aquí, <code>primerColor</code> toma el valor de <code>colores[0]</code>, <code>segundoColor</code> toma <code>colores[1]</code>, y así sucesivamente, según su posición.</p>
+                `
+            },
+            {
+                title: "Desestructuración de Arrays: Saltando Elementos",
+                type: "theory",
+                content: `
+                    <h2>Desestructuración de Arrays: Saltando Elementos</h2>
+                    <p>Puedes fácilmente saltar elementos en un array durante la desestructuración simplemente dejando un espacio vacío con una coma <code>,</code> en la posición que quieres omitir.</p>
+                    <h3>Ejemplo:</h3>
+                    <pre><code class="language-javascript">
+const datos = ['Manzana', 'Banana', 'Cereza', 'Dátil'];
+
+// Queremos solo el primer y tercer elemento
+const [fruta1, , fruta3] = datos;
+
+console.log(fruta1); // Salida: 'Manzana'
+console.log(fruta3); // Salida: 'Cereza'
+// Banana y Dátil fueron omitidos
+                    </code></pre>
+                    <p>El espacio vacío entre las comas indica que la segunda posición (índice 1) del array original debe ser ignorada.</p>
+                `
+            },
+            {
+                title: "Ejercicio 1: Desestructurar Array Básico",
+                type: "exercise",
+                content: `
+                    <p>Tienes un array llamado <code>numeros</code>. Usa la desestructuración para crear dos variables:</p>
+                    <ul>
+                        <li><code>primerNumero</code> que contenga el primer elemento.</li>
+                        <li><code>tercerNumero</code> que contenga el tercer elemento.</li>
+                    </ul>
+                    <p>Debes escribir la línea de desestructuración dentro del espacio provisto.</p>
+                `,
+                setupCode: `
+const numeros = [10, 20, 30, 40, 50];
+
+// Escribe tu código de desestructuración aquí:
+// const [variable1, , variable2] = ...;
+
+// No modifiques las líneas siguientes (son para la verificación):
+if (typeof primerNumero === 'undefined' || typeof tercerNumero === 'undefined') {
+    console.error("Asegúrate de declarar 'primerNumero' y 'tercerNumero'.");
+    // Esto fuerza un resultado inesperado si las variables no existen
+    window.exerciseResult = 'error_vars_undefined';
+} else {
+     window.exerciseResult = [primerNumero, tercerNumero];
+}
+                `,
+                codeToExecute: null, // User provides the code line
+                expectedOutput: [10, 30],
+                feedbackSuccess: "¡Correcto! Has extraído el primer y tercer número correctamente.",
+                feedbackFail: "Incorrecto. Revisa la sintaxis de desestructuración de arrays y cómo saltar elementos. Asegúrate que primerNumero sea 10 y tercerNumero sea 30."
+            },
+            {
+                title: "Desestructuración de Arrays: Valor por Defecto",
+                type: "theory",
+                content: `
+                    <h2>Desestructuración de Arrays: Valores por Defecto</h2>
+                    <p>¿Qué pasa si intentas desestructurar una posición del array que no existe (está <code>undefined</code>)? La variable tomará el valor <code>undefined</code>.</p>
+                    <p>Puedes asignar un valor por defecto a una variable desestructurada usando el operador de asignación <code>=</code>. Este valor por defecto se usará solo si el elemento del array en esa posición es <code>undefined</code> o no existe.</p>
+                    <h3>Ejemplo:</h3>
+                    <pre><code class="language-javascript">
+const frutas = ['Manzana', 'Banana'];
+
+// Asignando un valor por defecto para 'cereza'
+const [frutaA, frutaB, frutaC = 'Cereza por defecto'] = frutas;
+
+console.log(frutaA); // Salida: 'Manzana'
+console.log(frutaB); // Salida: 'Banana'
+console.log(frutaC); // Salida: 'Cereza por defecto' (porque frutas[2] es undefined)
+
+const colores = ['rojo', 'verde', undefined, 'púrpura'];
+// Asignando un valor por defecto para el tercer color
+const [color1, color2, color3 = 'azul por defecto', color4] = colores;
+
+console.log(color1); // Salida: 'rojo'
+console.log(color2); // Salida: 'verde'
+console.log(color3); // Salida: 'azul por defecto' (porque colores[2] es undefined)
+console.log(color4); // Salida: 'púrpura'
+                    </code></pre>
+                `
+            },
+             {
+                title: "Desestructuración de Arrays: Operador Rest (...)",
+                type: "theory",
+                content: `
+                    <h2>Desestructuración de Arrays: Operador Rest (...)</h2>
+                    <p>El operador "rest" (<code>...</code>) en la desestructuración de arrays te permite recoger todos los elementos restantes de un array en una nueva variable (que será un nuevo array).</p>
+                    <p>Debe ser el último elemento en el patrón de desestructuración.</p>
+                    <h3>Ejemplo:</h3>
+                    <pre><code class="language-javascript">
+const numeros = [1, 2, 3, 4, 5, 6];
+
+// Extraemos los dos primeros y recogemos el resto
+const [primero, segundo, ...restoNumeros] = numeros;
+
+console.log(primero);      // Salida: 1
+console.log(segundo);      // Salida: 2
+console.log(restoNumeros); // Salida: [3, 4, 5, 6]
+
+const [soloPrimero, ...todosLosDemas] = numeros;
+console.log(soloPrimero);     // Salida: 1
+console.log(todosLosDemas); // Salida: [2, 3, 4, 5, 6]
+                    </code></pre>
+                    <p>La variable precedida por <code>...</code> se convierte en un array que contiene los elementos no desestructurados individualmente.</p>
+                `
+            },
+            {
+                title: "Ejercicio 2: Desestructurar con Rest y Valor por Defecto",
+                type: "exercise",
+                content: `
+                    <p>Tienes un array llamado <code>items</code>. Usa la desestructuración para:</p>
+                    <ul>
+                        <li>Crear la variable <code>itemPrincipal</code> con el primer elemento.</li>
+                        <li>Crear la variable <code>segundoItem</code> con un valor por defecto 'Ninguno' si el segundo elemento no existe o es <code>undefined</code>.</li>
+                        <li>Crear la variable <code>otrosItems</code> que sea un array con todos los elementos restantes.</li>
+                    </ul>
+                     <p>El array <code>items</code> solo tiene un elemento inicial. Debes obtener el resultado <code>['Elemento 1', 'Ninguno', []]</code></p>
+                    <p>Escribe tu línea de desestructuración.</p>
+                `,
+                setupCode: `
+const items = ['Elemento 1']; // Este array tiene solo un elemento
+
+// Escribe tu código de desestructuración aquí:
+// const [variableA, variableB = ..., ...variableC] = items;
+
+// No modifiques las líneas siguientes (son para la verificación):
+if (typeof itemPrincipal === 'undefined' || typeof segundoItem === 'undefined' || typeof otrosItems === 'undefined') {
+     console.error("Asegúrate de declarar 'itemPrincipal', 'segundoItem' y 'otrosItems'.");
+     window.exerciseResult = 'error_vars_undefined';
+} else if (!Array.isArray(otrosItems)) {
+     console.error("'otrosItems' debe ser un array.");
+     window.exerciseResult = 'error_not_array';
+}
+else {
+     window.exerciseResult = [itemPrincipal, segundoItem, otrosItems];
+}
+                `,
+                codeToExecute: null, // User provides the code line
+                expectedOutput: ['Elemento 1', 'Ninguno', []],
+                feedbackSuccess: "¡Excelente! Combinaste la desestructuración, valores por defecto y el operador rest.",
+                feedbackFail: "Incorrecto. Revisa cómo usar valores por defecto (<code>variable = valor</code>) y el operador rest (<code>...variable</code>) en la desestructuración de arrays. Asegúrate de que <code>segundoItem</code> tenga un valor por defecto."
+            },
+            {
+                title: "Desestructuración de Objetos: Básico",
+                type: "theory",
+                content: `
+                    <h2>Desestructuración de Objetos</h2>
+                    <p>La desestructuración de objetos te permite extraer propiedades de un objeto y asignarlas a variables con el mismo nombre de la propiedad.</p>
+                    <p>La sintaxis utiliza llaves <code>{}</code> en el lado izquierdo de la asignación.</p>
+                    <h3>Ejemplo Básico:</h3>
+                    <pre><code class="language-javascript">
+const persona = {
+    nombre: 'Juan',
+    edad: 30,
+    ciudad: 'Madrid'
+};
+
+// Desestructuración
+const { nombre, edad } = persona;
+
+console.log(nombre); // Salida: 'Juan'
+console.log(edad);   // Salida: 30
+// La propiedad 'ciudad' no fue desestructurada
+                    </code></pre>
+                    <p>Aquí, se crean dos variables llamadas <code>nombre</code> y <code>edad</code>, y toman los valores de las propiedades correspondientes del objeto <code>persona</code>.</p>
+                    <div class="visual-hint">
+Objeto original:
+{
+  nombre: 'Juan',
+  edad: 30,
+  ciudad: 'Madrid'
+}
+
+Patrón de desestructuración:
+const { nombre, edad }
+
+Resultado:
+variable 'nombre' -> 'Juan'
+variable 'edad'   -> 30
+                    </div>
+                `
+            },
+            {
+                title: "Desestructuración de Objetos: Renombrar Variables",
+                type: "theory",
+                content: `
+                    <h2>Desestructuración de Objetos: Renombrar Variables</h2>
+                    <p>A menudo, querrás que la variable desestructurada tenga un nombre diferente al de la propiedad original. Puedes hacer esto usando la sintaxis <code>propiedad: nuevoNombreVariable</code>.</p>
+                    <h3>Ejemplo:</h3>
+                    <pre><code class="language-javascript">
+const libro = {
+    titulo: 'El Principito',
+    autor: 'Antoine de Saint-Exupéry',
+    año: 1943
+};
+
+// Desestructurar y renombrar 'titulo' y 'autor'
+const { titulo: nombreLibro, autor: nombreAutor } = libro;
+
+console.log(nombreLibro); // Salida: 'El Principito'
+console.log(nombreAutor); // Salida: 'Antoine de Saint-Exupéry'
+// 'titulo' y 'autor' como nombres de variable no existen aquí
+// console.log(titulo); // Error: titulo is not defined
+                    </code></pre>
+                    <p>La sintaxis <code>propiedad: nuevoNombre</code> significa "extrae la propiedad llamada 'propiedad' del objeto y asigna su valor a una nueva variable llamada 'nuevoNombre'".</p>
+                `
+            },
+            {
+                title: "Desestructuración de Objetos: Valor por Defecto",
+                type: "theory",
+                content: `
+                    <h2>Desestructuración de Objetos: Valores por Defecto</h2>
+                    <p>Similar a los arrays, puedes asignar un valor por defecto a una variable desestructurada de objeto si la propiedad correspondiente no existe en el objeto (o su valor es <code>undefined</code>).</p>
+                    <p>La sintaxis es <code>propiedad = valorPorDefecto</code> o <code>propiedad: nuevoNombre = valorPorDefecto</code>.</p>
+                    <h3>Ejemplo:</h3>
+                    <pre><code class="language-javascript">
+const usuario = {
+    id: 1,
+    nombre: 'Ana'
+    // correo no está presente
+};
+
+// Desestructurar con valor por defecto para 'correo'
+const { id, nombre, correo = 'correo@defecto.com' } = usuario;
+
+console.log(id);     // Salida: 1
+console.log(nombre); // Salida: 'Ana'
+console.log(correo); // Salida: 'correo@defecto.com' (porque 'correo' no existe en el objeto usuario)
+
+const producto = {
+    nombre: 'Laptop',
+    precio: 1200,
+    stock: undefined // Stock está definido pero es undefined
+};
+
+// Desestructurar con valor por defecto para 'stock' y renombrar
+const { nombre: nombreProducto, precio, stock: cantidadStock = 0 } = producto;
+
+console.log(nombreProducto); // Salida: 'Laptop'
+console.log(precio);         // Salida: 1200
+console.log(cantidadStock);  // Salida: 0 (porque 'stock' era undefined)
+                    </code></pre>
+                `
+            },
+             {
+                title: "Desestructuración de Objetos: Operador Rest (...)",
+                type: "theory",
+                content: `
+                    <h2>Desestructuración de Objetos: Operador Rest (...)</h2>
+                    <p>El operador "rest" (<code>...</code>) en la desestructuración de objetos te permite recoger todas las propiedades restantes de un objeto (que no fueron desestructuradas individualmente) en un nuevo objeto.</p>
+                    <p>Debe ser el último elemento en el patrón de desestructuración.</p>
+                    <h3>Ejemplo:</h3>
+                    <pre><code class="language-javascript">
+const configuracion = {
+    tema: 'oscuro',
+    idioma: 'es',
+    notificaciones: true,
+    autoplay: false
+};
+
+// Extraemos 'tema' e 'idioma' y recogemos el resto
+const { tema, idioma, ...otrasConfiguraciones } = configuracion;
+
+console.log(tema);               // Salida: 'oscuro'
+console.log(idioma);             // Salida: 'es'
+console.log(otrasConfiguraciones); // Salida: { notificaciones: true, autoplay: false }
+                    </code></pre>
+                     <p>La variable precedida por <code>...</code> se convierte en un *nuevo objeto* que contiene las propiedades no desestructuradas individualmente.</p>
+                `
+            },
+            {
+                title: "Ejercicio 3: Desestructurar Objeto con Renombre y Rest",
+                type: "exercise",
+                content: `
+                    <p>Tienes un objeto llamado <code>producto</code>. Usa la desestructuración para:</p>
+                    <ul>
+                        <li>Crear la variable <code>nombreProducto</code> usando la propiedad <code>name</code>.</li>
+                        <li>Crear la variable <code>precioActual</code> usando la propiedad <code>price</code>.</li>
+                        <li>Crear un objeto <code>detallesAdicionales</code> que contenga todas las demás propiedades (<code>category</code>, <code>inStock</code>).</li>
+                    </ul>
+                    <p>Escribe tu línea de desestructuración.</p>
+                `,
+                setupCode: `
+const producto = {
+    name: 'Teclado Mecánico',
+    price: 95,
+    category: 'Electrónica',
+    inStock: true
+};
+
+// Escribe tu código de desestructuración aquí:
+// const { propiedadA: variable1, propiedadB: variable2, ...variable3 } = ...;
+
+// No modifiques las líneas siguientes (son para la verificación):
+if (typeof nombreProducto === 'undefined' || typeof precioActual === 'undefined' || typeof detallesAdicionales === 'undefined') {
+     console.error("Asegúrate de declarar 'nombreProducto', 'precioActual' y 'detallesAdicionales'.");
+     window.exerciseResult = 'error_vars_undefined';
+} else if (typeof detallesAdicionales !== 'object' || detallesAdicionales === null || Array.isArray(detallesAdicionales)) {
+     console.error("'detallesAdicionales' debe ser un objeto.");
+     window.exerciseResult = 'error_not_object';
+}
+else {
+     window.exerciseResult = [nombreProducto, precioActual, detallesAdicionales];
+}
+                `,
+                codeToExecute: null, // User provides the code line
+                expectedOutput: ['Teclado Mecánico', 95, { category: 'Electrónica', inStock: true }],
+                feedbackSuccess: "¡Lo lograste! Combinaste renombrar propiedades y el operador rest al desestructurar un objeto.",
+                feedbackFail: "Incorrecto. Revisa cómo renombrar variables (<code>propiedad: nuevoNombre</code>) y usar el operador rest (<code>...variable</code>) en la desestructuración de objetos. Asegúrate de que los valores extraídos sean correctos."
+            },
+            {
+                title: "Aplicación: Desestructuración en Parámetros de Función",
+                type: "theory",
+                content: `
+                    <h2>Aplicación Común: Desestructuración en Parámetros de Función</h2>
+                    <p>Una aplicación muy común y útil de la desestructuración es al definir los parámetros de una función. Esto es especialmente útil cuando una función espera un objeto de configuración o un array de argumentos.</p>
+                    <h3>Ejemplo con Objeto:</h3>
+                    <pre><code class="language-javascript">
+// Función que recibe un objeto de configuración
+function mostrarInfoUsuario({ nombre, edad, ciudad = 'Desconocida' }) {
+    console.log(\`Nombre: \${nombre}\`);
+    console.log(\`Edad: \${edad}\`);
+    console.log(\`Ciudad: \${ciudad}\`); // Usa el valor por defecto si no se provee
+}
+
+const usuario1 = { nombre: 'Carlos', edad: 25, ciudad: 'Bogotá' };
+const usuario2 = { nombre: 'Luisa', edad: 28 }; // No tiene ciudad
+
+mostrarInfoUsuario(usuario1);
+// Salida:
+// Nombre: Carlos
+// Edad: 25
+// Ciudad: Bogotá
+
+mostrarInfoUsuario(usuario2);
+// Salida:
+// Nombre: Luisa
+// Edad: 28
+// Ciudad: Desconocida
+                    </code></pre>
+                    <p>Esto hace que la firma de la función sea más descriptiva y evita tener que escribir <code>config.nombre</code>, <code>config.edad</code>, etc., dentro de la función.</p>
+                     <h3>Ejemplo con Array (menos común pero posible):</h3>
+                      <pre><code class="language-javascript">
+// Función que espera un array de coordenadas [x, y]
+function mover([x, y]) {
+    console.log(\`Moviendo a X: \${x}, Y: \${y}\`);
+}
+
+const posicion = [10, 20];
+mover(posicion); // Salida: Moviendo a X: 10, Y: 20
+
+// También puedes usar valores por defecto
+function procesarColores([c1 = 'rojo', c2 = 'verde']) {
+    console.log(\`Color 1: \${c1}, Color 2: \${c2}\`);
+}
+
+procesarColores(['azul']); // Salida: Color 1: azul, Color 2: verde
+procesarColores([]);       // Salida: Color 1: rojo, Color 2: verde
+                    </code></pre>
+                `
+            },
+             {
+                title: "Ejercicio 4: Desestructurar Objeto en Parámetro de Función",
+                type: "exercise",
+                content: `
+                    <p>Define una función llamada <code>mostrarDetallesLibro</code> que acepte un *objeto* como su único argumento.</p>
+                    <p>Usa la desestructuración directamente en los parámetros de la función para extraer las propiedades <code>titulo</code> y <code>autor</code> del objeto.</p>
+                    <p>Dentro de la función, usa <code>console.log</code> para mostrar "Libro: [titulo] por [autor]".</p>
+                    <p>Luego, llama a la función con el objeto <code>libroEjemplo</code> proporcionado.</p>
+                    <p>El resultado esperado en la consola es: <code>Libro: Cien Años de Soledad por Gabriel García Márquez</code></p>
+                    <p>Escribe la definición de la función y la llamada a la función.</p>
+                `,
+                setupCode: `
+const libroEjemplo = {
+    titulo: 'Cien Años de Soledad',
+    autor: 'Gabriel García Márquez',
+    año: 1967
+};
+
+// Escribe tu código aquí (define la función y llámala):
+// function tuFuncion({ propiedad1, propiedad2 }) { ... }
+// tuFuncion(objeto);
+
+// No modifiques las líneas siguientes (son para la verificación):
+// Redirigimos console.log para capturar su salida
+let consoleOutput = '';
+const originalConsoleLog = console.log;
+console.log = (msg) => { consoleOutput += msg + '\\n'; };
+
+// Ejecutar el código del usuario
+try {
+    // user code will be inserted here
+} catch (e) {
+    originalConsoleLog("Error ejecutando el código:", e);
+} finally {
+    // Restaurar console.log
+    console.log = originalConsoleLog;
+    window.exerciseResult = consoleOutput.trim();
+}
+                `,
+                codeToExecute: null, // User provides the full function definition and call
+                expectedOutput: 'Libro: Cien Años de Soledad por Gabriel García Márquez',
+                feedbackSuccess: "¡Excelente! Has usado la desestructuración en los parámetros de una función correctamente.",
+                feedbackFail: (output) => {
+                    if (output.includes('Error ejecutando el código')) {
+                        return `Error en tu código. Revisa la sintaxis de la función y la desestructuración de parámetros. Mensaje de error: ${output}`;
+                    }
+                    return `Incorrecto. Revisa la definición de tu función y asegúrate de desestructurar 'titulo' y 'autor' y que el mensaje de console.log sea exacto. Tu salida fue: "${output}"`;
+                }
+            },
+            {
+                title: "Resumen y Próximos Pasos",
+                type: "theory",
+                content: `
+                    <h2>Resumen</h2>
+                    <p>Hemos cubierto los conceptos básicos de la desestructuración en JavaScript:</p>
+                    <ul>
+                        <li>Extraer valores de arrays por posición (<code>[]</code>).</li>
+                        <li>Extraer propiedades de objetos por nombre (<code>{}</code>).</li>
+                        <li>Saltar elementos en arrays (<code>, ,</code>).</li>
+                        <li>Asignar valores por defecto (<code>= valor</code>).</li>
+                        <li>Renombrar variables al desestructurar objetos (<code>propiedad: nuevoNombre</code>).</li>
+                        <li>Usar el operador rest (<code>...</code>) para recoger elementos restantes (arrays) o propiedades restantes (objetos).</li>
+                        <li>Una aplicación práctica: desestructuración en parámetros de función.</li>
+                    </ul>
+                    <p>La desestructuración ayuda a escribir código más limpio y legible cuando trabajas con arrays y objetos.</p>
+                    <h2>Próximos Pasos</h2>
+                    <p>Hay usos más avanzados de la desestructuración, como desestructuración anidada (desestructurar dentro de desestructuración) o usarla en bucles. Te animamos a explorar estos temas y practicar más para dominar esta técnica.</p>
+                    <p>¡Felicidades por completar esta guía básica!</p>
+                `
+            }
+            // Add more steps here...
+        ];
+
+        function displayStep(index) {
+            const step = steps[index];
+            contentDiv.innerHTML = step.content;
+            exerciseArea.style.display = 'none'; // Hide exercise area by default
+            feedbackDiv.style.display = 'none'; // Hide feedback
+
+            if (step.type === 'exercise') {
+                exerciseArea.style.display = 'block';
+                exerciseInstructions.innerHTML = step.content; // Use step.content for instructions
+                exerciseSetupCode.textContent = step.setupCode.trim(); // Display setup code
+                userCodeInput.value = ''; // Clear previous input
+                checkExerciseButton.onclick = () => checkExercise(step);
+
+                 // Handle code mirror or highlight later if needed, for now just <pre><code>
+            }
+
+            // Update button states
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === steps.length - 1;
+
+             // Scroll to top of content
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+         function sanitizeCode(code) {
+            // Basic sanitization for exercise evaluation context
+            // Avoid direct use of potentially harmful globals or syntax
+            // In a real production app, server-side evaluation or a more robust sandbox would be needed.
+            // For this basic guide, we assume simple variable assignments and console logs.
+            // We'll block common unwanted global access patterns.
+            const disallowed = [
+                /window\./, /document\./, /alert\(/, /prompt\(/, /confirm\(/, /fetch\(/,
+                /XMLHttpRequest/, /localStorage/, /sessionStorage/, /eval\(/, /Function\(/
+            ];
+            for (const pattern of disallowed) {
+                if (pattern.test(code)) {
+                    alert("Código potencialmente inseguro detectado. Por favor, ingresa solo el código de desestructuración solicitado.");
+                    return null; // Indicate failure
+                }
+            }
+            return code;
+        }
+
+
+        function checkExercise(step) {
+            const userCode = userCodeInput.value;
+            const fullCode = `${step.setupCode}\n${userCode}\n`; // Combine setup and user code
+
+             // Reset previous result placeholder
+            window.exerciseResult = undefined;
+            let evaluationError = null;
+
+            // Use a try-catch block to catch syntax or runtime errors
+            try {
+                // Basic evaluation in a restricted context (still not fully safe for production)
+                // Using a function wrapper to limit scope pollution
+                const exerciseFunction = new Function(fullCode);
+                exerciseFunction(); // Execute the combined code
+            } catch (e) {
+                evaluationError = e;
+                 // If there's an error, ensure exerciseResult reflects it if not already set
+                 if (window.exerciseResult === undefined) {
+                     window.exerciseResult = `Error: ${e.message}`;
+                 }
+            }
+
+
+            feedbackDiv.style.display = 'block';
+            feedbackDiv.classList.remove('success', 'fail');
+
+            let isCorrect = false;
+            let feedbackMessage = '';
+
+            if (evaluationError) {
+                feedbackMessage = `Error al ejecutar tu código: ${evaluationError.message}`;
+                feedbackDiv.classList.add('fail');
+            } else if (window.exerciseResult === 'error_vars_undefined') {
+                 feedbackMessage = "Error: Parece que las variables necesarias no fueron declaradas o nombradas correctamente.";
+                 feedbackDiv.classList.add('fail');
+             } else if (window.exerciseResult === 'error_not_array') {
+                 feedbackMessage = "Error: La variable destinada a contener el resto de elementos no es un array.";
+                 feedbackDiv.classList.add('fail');
+             } else if (window.exerciseResult === 'error_not_object') {
+                  feedbackMessage = "Error: La variable destinada a contener el resto de propiedades no es un objeto.";
+                  feedbackDiv.classList.add('fail');
+             }
+            else {
+                 // Compare results based on the expected output type
+                 if (Array.isArray(step.expectedOutput) && Array.isArray(window.exerciseResult)) {
+                     // Deep compare arrays
+                     if (step.expectedOutput.length === window.exerciseResult.length &&
+                         step.expectedOutput.every((val, index) => {
+                             // Handle objects within arrays for deeper comparison
+                             if (typeof val === 'object' && val !== null && typeof window.exerciseResult[index] === 'object' && window.exerciseResult[index] !== null) {
+                                 return JSON.stringify(val) === JSON.stringify(window.exerciseResult[index]);
+                             }
+                             return val === window.exerciseResult[index];
+                         })) {
+                         isCorrect = true;
+                     }
+                 } else if (typeof step.expectedOutput === 'string' && typeof window.exerciseResult === 'string') {
+                      // Simple string comparison (for console.log exercises)
+                      if (step.expectedOutput.trim() === window.exerciseResult.trim()) {
+                          isCorrect = true;
+                      }
+                 }
+                 // Add other comparison types if needed (e.g., simple primitives, object comparison)
+
+                if (isCorrect) {
+                    feedbackMessage = step.feedbackSuccess;
+                    feedbackDiv.classList.add('success');
+                } else {
+                    feedbackMessage = typeof step.feedbackFail === 'function' ? step.feedbackFail(window.exerciseResult) : step.feedbackFail;
+                    feedbackDiv.classList.add('fail');
+                }
+            }
+
+
+            feedbackDiv.textContent = feedbackMessage;
+
+             // Clean up the temporary global variable
+            delete window.exerciseResult;
+        }
+
+
+        prevBtn.addEventListener('click', () => {
+            if (currentStepIndex > 0) {
+                currentStepIndex--;
+                displayStep(currentStepIndex);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentStepIndex < steps.length - 1) {
+                currentStepIndex++;
+                displayStep(currentStepIndex);
+            }
+        });
+
+        // Initial display
+        displayStep(currentStepIndex);
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía Interactiva de Promesas en JavaScript - SENA</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        header {
+            background-color: #fff;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        header img {
+            height: 50px; /* Adjust as needed */
+            margin-right: 15px;
+        }
+        header h1 {
+            margin: 0;
+            font-size: 1.5em;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .step {
+            display: none; /* Hidden by default */
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .step:first-child {
+             padding-top: 0;
+        }
+         .step:last-child {
+             border-bottom: none;
+             padding-bottom: 0;
+        }
+        .step h2 {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        pre {
+            background-color: #f8f8f8;
+            border: 1px solid #ddd;
+            border-left: 3px solid #007bff;
+            color: #666;
+            page-break-inside: avoid;
+            font-family: monospace;
+            font-size: 1em;
+            line-height: 1.6;
+            margin-bottom: 1.6em;
+            max-width: 100%;
+            overflow: auto;
+            padding: 1em 1.5em;
+            display: block;
+            word-wrap: break-word;
+        }
+        code {
+            font-family: monospace;
+            background-color: #e9e9e9;
+            padding: 2px 4px;
+            border-radius: 4px;
+        }
+        pre code {
+             background-color: #f8f8f8;
+             padding: 0;
+        }
+        .visual-demo {
+            border: 1px dashed #007bff;
+            padding: 15px;
+            margin: 15px 0;
+            background-color: #e9f5ff;
+            font-style: italic;
+        }
+        .exercise {
+            border: 2px solid #28a745;
+            padding: 20px;
+            margin-top: 20px;
+            background-color: #e9ffe9;
+            border-radius: 5px;
+        }
+        .exercise h3 {
+            color: #28a745;
+            margin-top: 0;
+        }
+        .exercise input[type="text"] {
+            padding: 8px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+        .exercise button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+        }
+        .exercise button:hover {
+            background-color: #218838;
+        }
+        .feedback {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            min-height: 1.2em; /* Reserve space */
+        }
+        .feedback.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .feedback.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        #navigation {
+            margin-top: 20px;
+            text-align: center;
+        }
+        #navigation button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+        }
+        #navigation button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+         #navigation button:hover:not(:disabled) {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <img src="https://i.post.cc/mZzx20gW/Logosimbolo-SENA-PRINCIPAL.png" alt="Logo SENA">
+        <h1>Centro de Servicios y Gestión Empresarial</h1>
+    </header>
+
+    <div class="container" id="guide-container">
+
+        <!-- Step 0: Introduction -->
+        <div class="step" id="step-0">
+            <h2>Introducción a las Promesas en JavaScript</h2>
+            <p>¡Bienvenido a esta guía interactiva sobre Promesas en JavaScript! Las promesas son una forma moderna y poderosa de manejar operaciones asíncronas.</p>
+            <p>Antes de las promesas, era común usar <strong>callbacks anidados</strong> para manejar tareas asíncronas (como peticiones a servidores o timers). Esto a menudo llevaba a lo que se conoce como "Callback Hell" (Infierno de Callbacks), código difícil de leer, entender y mantener.</p>
+            <p>Las promesas nos ofrecen una alternativa más limpia y estructurada para trabajar con código que no se ejecuta de inmediato.</p>
+            <p>En esta guía, aprenderás:</p>
+            <ul>
+                <li>Qué son las promesas y por qué usarlas.</li>
+                <li>Los estados de una promesa.</li>
+                <li>Cómo crear una promesa básica.</li>
+                <li>Cómo manejar el éxito (<code>.then()</code>).</li>
+                <li>Cómo manejar errores (<code>.catch()</code>).</li>
+                <li>Cómo encadenar promesas para operaciones secuenciales.</li>
+            </ul>
+            <p>¡Comencemos!</p>
+        </div>
+
+        <!-- Step 1: What is a Promise? -->
+        <div class="step" id="step-1">
+            <h2>¿Qué es una Promesa?</h2>
+            <p>Una <strong>Promesa</strong> en JavaScript es un objeto que representa la terminación o el fracaso eventual de una operación asíncrona. Es como una garantía de que algo sucederá en el futuro, ya sea que se complete con éxito o falle.</p>
+            <p>Imagina que pides una pizza. La pizzería te da un ticket (la promesa). No tienes la pizza de inmediato (es asíncrono), pero tienes un compromiso de que la recibirás. Más tarde, puedes usar el ticket para:</p>
+            <ul>
+                <li><strong>Recoger la pizza</strong> si está lista (la promesa se <em>cumple/resuelve</em>).</li>
+                <li>Ser informado de que <strong>no pueden hacer la pizza</strong> (la promesa es <em>rechazada</em>).</li>
+            </ul>
+            <p>Una promesa puede estar en uno de tres estados:</p>
+            <ul>
+                <li><code>pending</code> (pendiente): Estado inicial, ni cumplida ni rechazada. La operación asíncrona aún no ha terminado.</li>
+                <li><code>fulfilled</code> (cumplida/resuelta): La operación se completó con éxito.</li>
+                <li><code>rejected</code> (rechazada): La operación falló.</li>
+            </ul>
+            <div class="visual-demo">
+                <strong>Representación Conceptual de una Promesa:</strong><br>
+                Inicio (pending)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v<br>
+                Operación Asíncrona (ej. cargar datos, timer)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+                &nbsp;&nbsp;&nbsp;/ &nbsp;&nbsp;&nbsp;&nbsp; \<br>
+                &nbsp;&nbsp;v &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; v<br>
+                fulfilled &nbsp;&nbsp;&nbsp; rejected<br>
+                (Éxito) &nbsp;&nbsp;&nbsp; (Fallo)
+            </div>
+            <p>Una vez que una promesa pasa de <code>pending</code> a <code>fulfilled</code> o <code>rejected</code>, se dice que está <strong>settled</strong> (resuelta o finalizada). Una promesa <strong>settled</strong> no puede cambiar su estado nuevamente.</p>
+        </div>
+
+         <!-- Step 2: Creating a Basic Promise -->
+         <div class="step" id="step-2">
+            <h2>Creando una Promesa Básica</h2>
+            <p>Puedes crear una nueva promesa usando el constructor <code>new Promise()</code>.</p>
+            <p>El constructor toma una función como argumento. Esta función se llama la <strong>función ejecutora</strong> (executor function).</p>
+            <p>La función ejecutora recibe dos argumentos:</p>
+            <ul>
+                <li><code>resolve</code>: Una función que debes llamar cuando la operación asíncrona se complete con éxito. La llamas con el valor resultante.</li>
+                <li><code>reject</code>: Una función que debes llamar cuando la operación asíncrona falle. La llamas con el motivo del fallo (generalmente un objeto <code>Error</code>).</li>
+            </ul>
+
+            <p>Aquí tienes un ejemplo simple usando <code>setTimeout</code> para simular una operación asíncrona:</p>
+            <pre><code class="language-javascript">const miPrimeraPromesa = new Promise((resolve, reject) => {
+  // Simular una operación asíncrona que tarda 1 segundo
+  setTimeout(() => {
+    const operacionExitosa = true; // Podría ser el resultado de una condición
+
+    if (operacionExitosa) {
+      resolve("¡La operación fue exitosa!"); // Llamar resolve si todo va bien
+    } else {
+      reject("Ocurrió un error en la operación."); // Llamar reject si algo falla
+    }
+  }, 1000); // Esperar 1000 milisegundos (1 segundo)
+});
+
+console.log("Promesa creada, estado inicial: pending"); // Se ejecuta inmediatamente
+</code></pre>
+            <p>Cuando ejecutas este código, el <code>console.log</code> se muestra inmediatamente porque <code>new Promise</code> es síncrono. La función dentro de la promesa se ejecuta, pero el <code>setTimeout</code> hace que la llamada a <code>resolve</code> o <code>reject</code> sea asíncrona.</p>
+
+             <div class="exercise" id="exercise-2">
+                <h3>Ejercicio 1: Creando una Promesa</h3>
+                <p>Observa el código anterior. Si <code>operacionExitosa</code> es <code>true</code>, ¿qué mensaje se pasará a la función <code>resolve</code>?</p>
+                 <p>Escribe el mensaje exacto:</p>
+                <input type="text" id="q2-input">
+                <button class="check-answer" data-step="2" data-answer="¡La operación fue exitosa!">Verificar</button>
+                <div class="feedback" id="q2-feedback"></div>
+            </div>
+
+        </div>
+
+        <!-- Step 3: Handling Success with .then() -->
+        <div class="step" id="step-3">
+            <h2>Manejando el Éxito con <code>.then()</code></h2>
+            <p>Una vez que tienes un objeto Promise, ¿cómo reaccionas cuando cambia su estado a <code>fulfilled</code>? Usas el método <code>.then()</code>.</p>
+            <p>El método <code>.then()</code> se adjunta a una promesa y toma una función como argumento. Esta función se ejecutará <strong>solo si</strong> la promesa se resuelve (pasa a estado <code>fulfilled</code>). El valor con el que se llamó a <code>resolve()</code> dentro de la promesa estará disponible como argumento de esta función.</p>
+
+            <pre><code class="language-javascript">const miPromesaExitosa = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    resolve("Datos cargados con éxito");
+  }, 500);
+});
+
+miPromesaExitosa.then((resultado) => {
+  console.log("Promesa cumplida:", resultado); // 'resultado' será "Datos cargados con éxito"
+});
+
+console.log("Esperando que la promesa se cumpla..."); // Esto se muestra primero
+</code></pre>
+
+            <div class="visual-demo">
+                <strong>Flujo de .then():</strong><br>
+                Promesa (pending)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v<br>
+                Llama a resolve(valor)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v<br>
+                Promesa (fulfilled)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v<br>
+                Se ejecuta la función dentro de .then(con valor)
+            </div>
+
+            <p>Puedes adjuntar múltiples <code>.then()</code> a la misma promesa. Todos se ejecutarán cuando la promesa se resuelva, en el orden en que fueron añadidos.</p>
+
+             <div class="exercise" id="exercise-3">
+                <h3>Ejercicio 2: Usando .then()</h3>
+                <p>Considera la siguiente promesa:</p>
+                <pre><code class="language-javascript">const promesaEjercicio = new Promise(resolve => {
+    setTimeout(() => resolve("¡Tarea completada!"), 300);
+});
+
+// ¿Qué línea de código imprimirá '¡Tarea completada!' en la consola?
+// A) console.log("¡Tarea completada!") inmediatamente
+// B) Un console.log dentro de un .then()
+// C) console.log("Esperando...")
+</code></pre>
+                 <p>Escribe la letra de la opción correcta (A, B o C):</p>
+                <input type="text" id="q3-input">
+                <button class="check-answer" data-step="3" data-answer="B">Verificar</button>
+                <div class="feedback" id="q3-feedback"></div>
+            </div>
+        </div>
+
+         <!-- Step 4: Handling Errors with .catch() -->
+         <div class="step" id="step-4">
+            <h2>Manejando Errores con <code>.catch()</code></h2>
+            <p>¿Qué pasa si la operación asíncrona falla? Ahí es donde entra <code>.catch()</code>.</p>
+            <p>El método <code>.catch()</code> es la forma estándar de manejar el caso en que una promesa es rechazada (pasa a estado <code>rejected</code>). Al igual que <code>.then()</code>, toma una función como argumento. Esta función se ejecutará <strong>solo si</strong> la promesa es rechazada. El motivo del fallo (el valor con el que se llamó a <code>reject()</code>) estará disponible como argumento de esta función.</p>
+
+             <pre><code class="language-javascript">const miPromesaFallida = new Promise((resolve, reject) => {
+  setTimeout(() => {
+    reject(new Error("Algo salió mal durante la carga de datos")); // Llamar reject con un Error
+  }, 500);
+});
+
+miPromesaFallida
+  .then((resultado) => {
+    console.log("Promesa cumplida (esto no se verá):", resultado);
+  })
+  .catch((error) => {
+    console.error("Promesa rechazada:", error.message); // 'error' es el objeto Error
+  });
+
+console.log("Esperando que la promesa falle..."); // Esto se muestra primero
+</code></pre>
+            <div class="visual-demo">
+                <strong>Flujo de .catch():</strong><br>
+                Promesa (pending)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v<br>
+                Llama a reject(motivo)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v<br>
+                Promesa (rejected)<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;v<br>
+                Se ejecuta la función dentro de .catch(con motivo)
+            </div>
+            <p>Es una buena práctica siempre adjuntar un <code>.catch()</code> al final de tu cadena de promesas para manejar cualquier error que pueda ocurrir en la cadena.</p>
+
+             <div class="exercise" id="exercise-4">
+                <h3>Ejercicio 3: Usando .catch()</h3>
+                <p>Considera el siguiente código:</p>
+                <pre><code class="language-javascript">const promesaFallo = new Promise((resolve, reject) => {
+    // Simula un fallo
+    reject("¡Ups! Hubo un problema.");
+});
+
+promesaFallo
+    .then(data => console.log("Éxito:", data))
+    .catch(error => console.log("Fallo:", error));
+
+</code></pre>
+                <p>Cuando se ejecute este código, ¿qué se imprimirá en la consola?</p>
+                 <p>Escribe la salida exacta esperada:</p>
+                <input type="text" id="q4-input">
+                <button class="check-answer" data-step="4" data-answer="Fallo: ¡Ups! Hubo un problema.">Verificar</button>
+                <div class="feedback" id="q4-feedback"></div>
+            </div>
+
+         </div>
+
+         <!-- Step 5: Chaining Promises -->
+         <div class="step" id="step-5">
+            <h2>Encadenando Promesas (Chaining)</h2>
+            <p>Una de las mayores ventajas de las promesas es la capacidad de encadenarlas para realizar una secuencia de operaciones asíncronas, donde cada operación depende del resultado de la anterior.</p>
+            <p>Los métodos <code>.then()</code> (y también <code>.catch()</code>) siempre <strong>devuelven una nueva promesa</strong>. Esto te permite llamar a otro <code>.then()</code> o <code>.catch()</code> inmediatamente después, creando una cadena.</p>
+
+            <p><strong>Reglas clave para encadenar <code>.then()</code>:</strong></p>
+            <ol>
+                <li>Si la función dentro de <code>.then()</code> devuelve un <strong>valor normal</strong> (no una promesa), la promesa devuelta por <code>.then()</code> se resolverá con ese valor.</li>
+                <li>Si la función dentro de <code>.then()</code> devuelve una <strong>nueva promesa</strong>, la promesa devuelta por el <code>.then()</code> esperará a que esa nueva promesa se resuelva o rechace, y adoptará su estado y valor/motivo.</li>
+                <li>Si la función dentro de <code>.then()</code> lanza un <strong>error</strong>, la promesa devuelta por <code>.then()</code> será rechazada con ese error.</li>
+            </ol>
+
+             <p>Aquí tienes un ejemplo:</p>
+             <pre><code class="language-javascript">new Promise(resolve => setTimeout(() => resolve(1), 1000))
+  .then(resultado => {
+    console.log(resultado); // Imprime 1 después de 1 segundo
+    return resultado + 1; // Devuelve un valor normal
+  })
+  .then(resultado => {
+    console.log(resultado); // Imprime 2 después de (1s + 0s)
+    return new Promise(resolve => setTimeout(() => resolve(resultado + 1), 1000)); // Devuelve una nueva promesa
+  })
+  .then(resultado => {
+    console.log(resultado); // Imprime 3 después de (1s + 1s)
+    // No devuelve nada, es como devolver undefined
+  })
+  .catch(error => {
+    console.error("Algún error en la cadena:", error);
+  });
+
+console.log("Iniciando cadena de promesas..."); // Se ejecuta primero
+</code></pre>
+            <div class="visual-demo">
+                <strong>Flujo de Encadenamiento:</strong><br>
+                Promesa A (resuelve con X) -> .then(recibe X, devuelve Y) -> Nueva Promesa B (resuelve con Y)<br>
+                Nueva Promesa B (resuelve con Y) -> .then(recibe Y, devuelve Promesa C) -> Nueva Promesa D (espera a Promesa C)<br>
+                Promesa C (resuelve con Z) -> Nueva Promesa D (ahora resuelve con Z)<br>
+                Nueva Promesa D (resuelve con Z) -> .then(recibe Z, devuelve W)<br>
+                ... y así sucesivamente. El .catch() al final atrapa errores de cualquier .then() o promesa en la cadena.
+            </div>
+
+             <div class="exercise" id="exercise-5">
+                <h3>Ejercicio 4: Encadenando Promesas</h3>
+                <p>Considera la siguiente cadena de promesas:</p>
+                <pre><code class="language-javascript">new Promise(resolve => setTimeout(() => resolve("Hola"), 200))
+  .then(mensaje => {
+    console.log("Paso 1:", mensaje); // ¿Qué imprime aquí?
+    return mensaje + " Mundo";
+  })
+  .then(mensajeCompleto => {
+    console.log("Paso 2:", mensajeCompleto); // ¿Qué imprime aquí?
+    return 5; // Devuelve un número
+  })
+  .then(numero => {
+      console.log("Paso 3:", numero * 2); // ¿Qué imprime aquí?
+  });
+</code></pre>
+                <p>¿Cuál será la última línea de salida impresa en la consola?</p>
+                 <p>Escribe la salida exacta de la última línea:</p>
+                <input type="text" id="q5-input">
+                <button class="check-answer" data-step="5" data-answer="Paso 3: 10">Verificar</button>
+                <div class="feedback" id="q5-feedback"></div>
+            </div>
+        </div>
+
+         <!-- Step 6: Summary and Next Steps -->
+        <div class="step" id="step-6">
+            <h2>Resumen y Próximos Pasos</h2>
+            <p>¡Felicidades! Has completado la guía básica sobre Promesas en JavaScript.</p>
+            <p>Hemos cubierto:</p>
+            <ul>
+                <li>La necesidad de las promesas para manejar asincronía mejor que los callbacks anidados.</li>
+                <li>Los estados de una promesa: <code>pending</code>, <code>fulfilled</code>, <code>rejected</code>.</li>
+                <li>Cómo crear una promesa con <code>new Promise(executor)</code>, usando <code>resolve</code> y <code>reject</code>.</li>
+                <li>Cómo manejar el éxito con <code>.then()</code>.</li>
+                <li>Cómo manejar errores con <code>.catch()</code>.</li>
+                <li>Cómo encadenar <code>.then()</code> para secuencias asíncronas.</li>
+            </ul>
+
+            <p>Las promesas son fundamentales en el desarrollo moderno de JavaScript, especialmente cuando trabajas con APIs web, fetch, Node.js, y la sintaxis <code>async/await</code> (que se basa en promesas).</p>
+
+            <p><strong>Próximos pasos:</strong></p>
+            <ul>
+                <li>Practica creando tus propias promesas y encadenándolas.</li>
+                <li>Explora otros métodos estáticos de <code>Promise</code> como <code>Promise.all()</code>, <code>Promise.race()</code>, <code>Promise.any()</code>, y <code>Promise.allSettled()</code> para manejar múltiples promesas a la vez.</li>
+                <li>Aprende sobre <code>async</code> y <code>await</code>, que proporcionan una sintaxis más limpia para trabajar con promesas.</li>
+            </ul>
+
+            <p>¡Sigue practicando y explorando!</p>
+        </div>
+
+
+    </div>
+
+    <div id="navigation">
+        <button id="prev-btn" disabled>Anterior</button>
+        <button id="next-btn">Siguiente</button>
+    </div>
+
+    <script>
+        const guideContainer = document.getElementById('guide-container');
+        const steps = guideContainer.querySelectorAll('.step');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        let currentStepIndex = 0;
+
+        function showStep(index) {
+            // Hide all steps
+            steps.forEach(step => {
+                step.style.display = 'none';
+            });
+
+            // Show the current step
+            if (steps[index]) {
+                steps[index].style.display = 'block';
+                currentStepIndex = index;
+            }
+
+            // Update button states
+            prevBtn.disabled = currentStepIndex === 0;
+            nextBtn.disabled = currentStepIndex === steps.length - 1;
+
+            // Clear feedback for exercises when navigating
+            guideContainer.querySelectorAll('.feedback').forEach(feedbackDiv => {
+                feedbackDiv.textContent = '';
+                feedbackDiv.className = 'feedback'; // Reset classes
+            });
+        }
+
+        function checkAnswer(button) {
+            const stepElement = button.closest('.step');
+            const exerciseDiv = button.closest('.exercise');
+            const input = exerciseDiv.querySelector('input[type="text"]');
+            const feedbackDiv = exerciseDiv.querySelector('.feedback');
+            const correctAnswer = button.dataset.answer.trim().toLowerCase(); // Get answer from data attribute
+            const userAnswer = input.value.trim().toLowerCase();
+
+            feedbackDiv.textContent = ''; // Clear previous feedback
+            feedbackDiv.className = 'feedback'; // Reset classes
+
+            if (userAnswer === correctAnswer) {
+                feedbackDiv.textContent = '¡Correcto!';
+                feedbackDiv.classList.add('success');
+            } else {
+                feedbackDiv.textContent = `Incorrecto. La respuesta correcta es: "${button.dataset.answer}"`;
+                feedbackDiv.classList.add('error');
+            }
+        }
+
+        // Event listeners for navigation
+        prevBtn.addEventListener('click', () => {
+            if (currentStepIndex > 0) {
+                showStep(currentStepIndex - 1);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentStepIndex < steps.length - 1) {
+                showStep(currentStepIndex + 1);
+            }
+        });
+
+        // Event listeners for exercise buttons (using event delegation)
+        guideContainer.addEventListener('click', (event) => {
+            if (event.target.classList.contains('check-answer')) {
+                checkAnswer(event.target);
+            }
+        });
+
+
+        // Initialize the guide
+        showStep(0);
+
+    </script>
+
+</body>
+</html>
